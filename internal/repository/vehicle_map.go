@@ -43,3 +43,21 @@ func (r *VehicleMap) Create(v *internal.Vehicle) (err error) {
 	r.db[v.Id] = *v
 	return
 }
+
+// FindByColorAndYear is a method that returns a map of vehicles that match color and year
+func (r *VehicleMap) FindByColorAndYear(color string, year int) (v map[int]internal.Vehicle, err error) {
+	v = make(map[int]internal.Vehicle)
+
+	// Search in db
+	for key, value := range r.db {
+		if value.Color == color && value.FabricationYear == year {
+			v[key] = value
+		}
+	}
+
+	if len(v) == 0 {
+		err = internal.ErrVehiclesNotFound
+	}
+
+	return
+}

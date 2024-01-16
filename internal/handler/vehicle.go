@@ -4,8 +4,10 @@ import (
 	"app/internal"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/bootcamp-go/web/response"
+	"github.com/go-chi/chi/v5"
 )
 
 // VehicleJSON is a struct that represents a vehicle in JSON format
@@ -125,6 +127,60 @@ func (h *VehicleDefault) Create() http.HandlerFunc {
 		// response
 		response.JSON(w, http.StatusCreated, map[string]any{
 			"message": "Vehículo creado exitosamente.",
+		})
+	}
+}
+
+// GetByColorAndYear is a method that returns a handler for the route GET /vehicles/color{color}/year/{year}
+func (h *VehicleDefault) GetByColorAndYear() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get color and year from URL using chi
+		color := chi.URLParam(r, "color")
+		yearString := chi.URLParam(r, "year")
+		year, err := strconv.Atoi(yearString)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Año mal formado.")
+			return
+		}
+
+		// process
+		// - get vehicles by color and year
+		v, err := h.sv.FindByColorAndYear(color, year)
+		if err != nil {
+			switch err {
+			case internal.ErrVehiclesNotFound:
+				response.Error(w, http.StatusNotFound, "No se encontraron vehículos con esos criterios.")
+				return
+			default:
+				response.Error(w, http.StatusInternalServerError, "Algo ha salido mal.")
+				return
+			}
+		}
+
+		// response
+		data := make(map[int]VehicleJSON)
+		for key, value := range v {
+			data[key] = VehicleJSON{
+				ID:              value.Id,
+				Brand:           value.Brand,
+				Model:           value.Model,
+				Registration:    value.Registration,
+				Color:           value.Color,
+				FabricationYear: value.FabricationYear,
+				Capacity:        value.Capacity,
+				MaxSpeed:        value.MaxSpeed,
+				FuelType:        value.FuelType,
+				Transmission:    value.Transmission,
+				Weight:          value.Weight,
+				Height:          value.Height,
+				Length:          value.Length,
+				Width:           value.Width,
+			}
+		}
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "Vehículos encontrados exitosamente.",
+			"data":    data,
 		})
 	}
 }
