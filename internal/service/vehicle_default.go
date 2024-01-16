@@ -48,3 +48,17 @@ func (s *VehicleDefault) FindByColorAndYear(color string, year int) (v map[int]i
 	}
 	return
 }
+
+// Delete is a method that deletes a vehicle from the repository
+func (s *VehicleDefault) Delete(id int) (err error) {
+	err = s.rp.Delete(id)
+	if err != nil {
+		switch err {
+		case internal.ErrVehicleNotFound:
+			return
+		default:
+			err = internal.ErrInternalServer
+		}
+	}
+	return
+}

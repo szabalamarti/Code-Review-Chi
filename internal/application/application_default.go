@@ -76,6 +76,8 @@ func (a *ServerChi) Run() (err error) {
 		rt.Post("/", hd.Create())
 		// - GET /vehicles/color/{color}/year/{year}
 		rt.Get("/color/{color}/year/{year}", hd.GetByColorAndYear())
+		// - DELETE /vehicles/{id}
+		rt.Delete("/{id}", hd.Delete())
 	})
 
 	// run server

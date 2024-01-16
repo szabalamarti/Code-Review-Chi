@@ -184,3 +184,34 @@ func (h *VehicleDefault) GetByColorAndYear() http.HandlerFunc {
 		})
 	}
 }
+
+// Delete is a method that returns a handler for the route DELETE /vehicles/{id}
+func (h *VehicleDefault) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get id from URL using chi
+		idString := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idString)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Identificador mal formado.")
+			return
+		}
+
+		// process
+		// - delete vehicle by id
+		err = h.sv.Delete(id)
+		if err != nil {
+			switch err {
+			case internal.ErrVehicleNotFound:
+				response.Error(w, http.StatusNotFound, "No se encontró el vehículo con ese identificador.")
+				return
+			default:
+				response.Error(w, http.StatusInternalServerError, "Algo ha salido mal.")
+				return
+			}
+		}
+
+		// response
+		response.Text(w, http.StatusNoContent, "Vehículo eliminado exitosamente.")
+	}
+}

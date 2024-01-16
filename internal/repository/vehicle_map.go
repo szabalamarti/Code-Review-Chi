@@ -61,3 +61,13 @@ func (r *VehicleMap) FindByColorAndYear(color string, year int) (v map[int]inter
 
 	return
 }
+
+// Delete is a method that deletes a vehicle from the repository
+func (r *VehicleMap) Delete(id int) (err error) {
+	if _, ok := r.db[id]; !ok {
+		err = internal.ErrVehicleNotFound
+		return
+	}
+	delete(r.db, id)
+	return
+}

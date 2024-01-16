@@ -15,4 +15,6 @@ type VehicleService interface {
 	Create(v *Vehicle) (err error)
 	// FindByColorAndYear is a method that returns a map of vehicles that match color and year
 	FindByColorAndYear(color string, year int) (v map[int]Vehicle, err error)
+	// Delete is a method that deletes a vehicle from the repository
+	Delete(id int) (err error)
 }

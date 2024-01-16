@@ -9,6 +9,8 @@ var (
 	ErrVehicleMandatoryFields = errors.New("vehicle missing mandatory fields")
 	// ErrVehiclesNotFound is an error that represents that no vehicles were found with the given criteria
 	ErrVehiclesNotFound = errors.New("vehicles not found")
+	// ErrVehicleNotFound is an error that represents that the vehicle was not found
+	ErrVehicleNotFound = errors.New("vehicle not found")
 )
 
 // VehicleRepository is an interface that represents a vehicle repository
@@ -19,4 +21,6 @@ type VehicleRepository interface {
 	Create(v *Vehicle) (err error)
 	// FindByColorAndYear is a method that returns a map of vehicles that match color and year
 	FindByColorAndYear(color string, year int) (v map[int]Vehicle, err error)
+	// Delete is a method that deletes a vehicle from the repository
+	Delete(id int) (err error)
 }
