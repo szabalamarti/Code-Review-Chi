@@ -44,3 +44,28 @@ type Vehicle struct {
 	// VehicleAttribue is the attributes of a vehicle
 	VehicleAttributes
 }
+
+// NewVehicle is a function that returns a new instance of Vehicle
+func NewVehicle(id int, brand string, model string, registration string, color string, fabricationYear int, capacity int, maxSpeed float64, fuelType string, transmission string, weight float64, height float64, length float64, width float64) *Vehicle {
+	return &Vehicle{
+		Id: id,
+		VehicleAttributes: VehicleAttributes{
+			Brand:           brand,
+			Model:           model,
+			Registration:    registration,
+			Color:           color,
+			FabricationYear: fabricationYear,
+			Capacity:        capacity,
+			MaxSpeed:        maxSpeed,
+			FuelType:        fuelType,
+
+			Transmission: transmission,
+			Weight:       weight,
+			Dimensions: Dimensions{
+				Height: height,
+				Length: length,
+				Width:  width,
+			},
+		},
+	}
+}

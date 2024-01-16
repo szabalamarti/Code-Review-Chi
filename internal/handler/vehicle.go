@@ -2,6 +2,7 @@ package handler
 
 import (
 	"app/internal"
+	"encoding/json"
 	"net/http"
 
 	"github.com/bootcamp-go/web/response"
@@ -73,6 +74,57 @@ func (h *VehicleDefault) GetAll() http.HandlerFunc {
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",
 			"data":    data,
+		})
+	}
+}
+
+// Create is a method that returns a handler for the route POST /vehicles
+func (h *VehicleDefault) Create() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		var reqBody VehicleJSON
+		err := json.NewDecoder(r.Body).Decode(&reqBody)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Datos del vehículo mal formados o incompletos.")
+			return
+		}
+
+		// process
+		vehicle := internal.NewVehicle(
+			reqBody.ID,
+			reqBody.Brand,
+			reqBody.Model,
+			reqBody.Registration,
+			reqBody.Color,
+			reqBody.FabricationYear,
+			reqBody.Capacity,
+			reqBody.MaxSpeed,
+			reqBody.FuelType,
+			reqBody.Transmission,
+			reqBody.Weight,
+			reqBody.Height,
+			reqBody.Length,
+			reqBody.Width,
+		)
+
+		err = h.sv.Create(vehicle)
+		if err != nil {
+			switch err {
+			case internal.ErrVehicleAlreadyExists:
+				response.Error(w, http.StatusConflict, "Identificador del vehículo ya existente.")
+				return
+			case internal.ErrVehicleMandatoryFields:
+				response.Error(w, http.StatusBadRequest, "Datos del vehículo mal formados o incompletos.")
+				return
+			default:
+				response.Error(w, http.StatusInternalServerError, "Algo ha salido mal.")
+				return
+			}
+		}
+
+		// response
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"message": "Vehículo creado exitosamente.",
 		})
 	}
 }
