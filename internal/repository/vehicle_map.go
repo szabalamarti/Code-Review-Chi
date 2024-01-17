@@ -44,6 +44,17 @@ func (r *VehicleMap) Create(v *internal.Vehicle) (err error) {
 	return
 }
 
+// BatchCreate is a method that adds a list of vehicles to the repository
+func (r *VehicleMap) BatchCreate(v []*internal.Vehicle) (err error) {
+	for _, vehicle := range v {
+		err = r.Create(vehicle)
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
 // FindByColorAndYear is a method that returns a map of vehicles that match color and year
 func (r *VehicleMap) FindByColorAndYear(color string, year int) (v map[int]internal.Vehicle, err error) {
 	v = make(map[int]internal.Vehicle)

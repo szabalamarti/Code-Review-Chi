@@ -35,6 +35,22 @@ func (s *VehicleDefault) Create(v *internal.Vehicle) (err error) {
 	return
 }
 
+// BatchCreate is a method that adds a list of vehicles to the repository
+func (s *VehicleDefault) BatchCreate(v []*internal.Vehicle) (err error) {
+	err = s.rp.BatchCreate(v)
+	if err != nil {
+		switch err {
+		case internal.ErrVehicleAlreadyExists:
+			return
+		case internal.ErrVehicleMandatoryFields:
+			return
+		default:
+			err = internal.ErrInternalServer
+		}
+	}
+	return
+}
+
 // FindByColorAndYear is a method that returns a map of vehicles that match color and year
 func (s *VehicleDefault) FindByColorAndYear(color string, year int) (v map[int]internal.Vehicle, err error) {
 	v, err = s.rp.FindByColorAndYear(color, year)

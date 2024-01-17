@@ -13,6 +13,8 @@ type VehicleService interface {
 	FindAll() (v map[int]Vehicle, err error)
 	// Create is a method that adds a vehicle to the repository
 	Create(v *Vehicle) (err error)
+	// BatchCreate is a method that adds a list of vehicles to the repository
+	BatchCreate(v []*Vehicle) (err error)
 	// FindByColorAndYear is a method that returns a map of vehicles that match color and year
 	FindByColorAndYear(color string, year int) (v map[int]Vehicle, err error)
 	// Delete is a method that deletes a vehicle from the repository

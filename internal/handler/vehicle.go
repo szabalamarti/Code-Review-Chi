@@ -131,6 +131,67 @@ func (h *VehicleDefault) Create() http.HandlerFunc {
 	}
 }
 
+// VehicleBatchJSON is a struct that represents a list of vehicles in JSON format
+type VehicleBatchJSON struct {
+	Vehicles []VehicleJSON `json:"vehicles"`
+}
+
+// BatchCreate is a method that returns a handler for the route POST /vehicles/batch
+func (h *VehicleDefault) BatchCreate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		var reqBody VehicleBatchJSON
+		err := json.NewDecoder(r.Body).Decode(&reqBody)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Datos de algún vehículo mal formados o incompletos.")
+			return
+		}
+
+		// process
+		// make a slice of pointers
+		vehicles := make([]*internal.Vehicle, len(reqBody.Vehicles))
+		for i, v := range reqBody.Vehicles {
+			vehicles[i] = internal.NewVehicle(
+				v.ID,
+				v.Brand,
+				v.Model,
+				v.Registration,
+				v.Color,
+				v.FabricationYear,
+				v.Capacity,
+				v.MaxSpeed,
+				v.FuelType,
+				v.Transmission,
+				v.Weight,
+				v.Height,
+				v.Length,
+				v.Width,
+			)
+		}
+
+		// call the service to create the vehicles
+		err = h.sv.BatchCreate(vehicles)
+		if err != nil {
+			switch err {
+			case internal.ErrVehicleAlreadyExists:
+				response.Error(w, http.StatusConflict, "Algún vehículo tiene un identificador ya existente.")
+				return
+			case internal.ErrVehicleMandatoryFields:
+				response.Error(w, http.StatusBadRequest, "Datos de algún vehículo mal formados o incompletos.")
+				return
+			default:
+				response.Error(w, http.StatusInternalServerError, "Algo ha salido mal.")
+				return
+			}
+		}
+
+		// response
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"message": "Vehículos creados exitosamente.",
+		})
+	}
+}
+
 // GetByColorAndYear is a method that returns a handler for the route GET /vehicles/color{color}/year/{year}
 func (h *VehicleDefault) GetByColorAndYear() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
