@@ -112,3 +112,21 @@ func (r *VehicleMap) FindByWeightRange(minWeight, maxWeight float64) (v map[int]
 
 	return
 }
+
+// FindByBrandAndYearRange is a method that returns a map of vehicles that match brand and year range
+func (r *VehicleMap) FindByBrandAndYearRange(brand string, minYear, maxYear int) (v map[int]internal.Vehicle, err error) {
+	v = make(map[int]internal.Vehicle)
+
+	// Search in db
+	for key, value := range r.db {
+		if value.Brand == brand && value.FabricationYear >= minYear && value.FabricationYear <= maxYear {
+			v[key] = value
+		}
+	}
+
+	if len(v) == 0 {
+		err = internal.ErrVehiclesNotFound
+	}
+
+	return
+}

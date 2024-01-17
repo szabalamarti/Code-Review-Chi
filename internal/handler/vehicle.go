@@ -384,3 +384,67 @@ func (h *VehicleDefault) GetByWeightRange() http.HandlerFunc {
 		})
 	}
 }
+
+// GetByBrandAndYearRange is a method that returns a handler for the route GET /vehicles/brand/{brand}/between/{start_year}/{end_year}
+func (h *VehicleDefault) GetByBrandAndYearRange() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		brand := chi.URLParam(r, "brand")
+		startYearString := chi.URLParam(r, "start_year")
+		endYearString := chi.URLParam(r, "end_year")
+
+		// convert startYearString and endYearString to int
+		startYear, err := strconv.Atoi(startYearString)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Año de inicio mal formado.")
+			return
+		}
+		endYear, err := strconv.Atoi(endYearString)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Año de fin mal formado.")
+			return
+		}
+
+		// process
+		// call the service method to get the vehicles by brand and year range
+		v, err := h.sv.FindByBrandAndYearRange(brand, startYear, endYear)
+
+		if err != nil {
+			switch err {
+			case internal.ErrVehiclesNotFound:
+				response.Error(w, http.StatusNotFound, "No se encontraron vehículos con esos criterios.")
+				return
+			default:
+				response.Error(w, http.StatusInternalServerError, "Algo ha salido mal.")
+				return
+			}
+		}
+
+		// serialize
+		var data []VehicleJSON
+		for _, value := range v {
+			data = append(data, VehicleJSON{
+				ID:              value.Id,
+				Brand:           value.Brand,
+				Model:           value.Model,
+				Registration:    value.Registration,
+				Color:           value.Color,
+				FabricationYear: value.FabricationYear,
+				Capacity:        value.Capacity,
+				MaxSpeed:        value.MaxSpeed,
+				FuelType:        value.FuelType,
+				Transmission:    value.Transmission,
+				Weight:          value.Weight,
+				Height:          value.Height,
+				Length:          value.Length,
+				Width:           value.Width,
+			})
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "Vehículos encontrados exitosamente.",
+			"data":    data,
+		})
+	}
+}

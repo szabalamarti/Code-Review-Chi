@@ -46,3 +46,8 @@ func (m *VehicleDefaultMock) FindByWeightRange(minWeight, maxWeight float64) (v 
 	args := m.Called(minWeight, maxWeight)
 	return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
 }
+
+func (m *VehicleDefaultMock) FindByBrandAndYearRange(brand string, minYear, maxYear int) (v map[int]internal.Vehicle, err error) {
+	args := m.Called(brand, minYear, maxYear)
+	return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
+}

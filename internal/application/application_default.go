@@ -84,6 +84,8 @@ func (a *ServerChi) Run() (err error) {
 		rt.Put("/{id}/fuel-type", hd.UpdateFuelType())
 		// - GET /weight?min={weight_min}&max={weight_max}
 		rt.Get("/weight", hd.GetByWeightRange())
+		// - GET /vehicles/brand/{brand}/between/{start_year}/{end_year}
+		rt.Get("/brand/{brand}/between/{start_year}/{end_year}", hd.GetByBrandAndYearRange())
 	})
 
 	// run server

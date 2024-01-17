@@ -29,4 +29,6 @@ type VehicleRepository interface {
 	UpdateFuelType(id int, fuelType string) (err error)
 	// FindByWeightRange is a method that returns a map of vehicles that match weight range
 	FindByWeightRange(minWeight, maxWeight float64) (v map[int]Vehicle, err error)
+	// FindByBrandAndYearRange is a method that returns a map of vehicles that match brand and year range
+	FindByBrandAndYearRange(brand string, minYear, maxYear int) (v map[int]Vehicle, err error)
 }

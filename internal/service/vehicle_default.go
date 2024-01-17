@@ -106,3 +106,19 @@ func (s *VehicleDefault) FindByWeightRange(minWeight, maxWeight float64) (v map[
 	}
 	return
 }
+
+// FindByBrandAndYearRange is a method that returns a map of vehicles that match brand and year range
+func (s *VehicleDefault) FindByBrandAndYearRange(brand string, minYear, maxYear int) (v map[int]internal.Vehicle, err error) {
+	// call repository method
+	v, err = s.rp.FindByBrandAndYearRange(brand, minYear, maxYear)
+	// handle errors
+	if err != nil {
+		switch err {
+		case internal.ErrVehiclesNotFound:
+			return
+		default:
+			err = internal.ErrInternalServer
+		}
+	}
+	return
+}

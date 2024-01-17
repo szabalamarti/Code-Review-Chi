@@ -8,6 +8,7 @@ All endpoint specifications can be found in this [document](https://docs.google.
 Currently implemented:
 - 1. "Añadir un vehículo"
 - 2. "Buscar vehículos por color y año"
+- 3. "Buscar vehículos por marca y rango de años"
 - 5. "Añadir múltiples vehículos"
 - 8. "Eliminar un vehículo"
 - 10. "Actualizar el tipo de combustible de un vehículo"
