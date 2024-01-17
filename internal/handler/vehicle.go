@@ -28,6 +28,16 @@ type VehicleJSON struct {
 	Width           float64 `json:"width"`
 }
 
+// VehicleBatchJSON is a struct that represents a list of vehicles in JSON format
+type VehicleBatchJSON struct {
+	Vehicles []VehicleJSON `json:"vehicles"`
+}
+
+// UpdateFuelTypeJSON is a struct that represents the request body for the route PUT /vehicles/{id}/fuel_type
+type UpdateFuelTypeJSON struct {
+	FuelType string `json:"fuel_type"`
+}
+
 // NewVehicleDefault is a function that returns a new instance of VehicleDefault
 func NewVehicleDefault(sv internal.VehicleService) *VehicleDefault {
 	return &VehicleDefault{sv: sv}
@@ -109,6 +119,7 @@ func (h *VehicleDefault) Create() http.HandlerFunc {
 			reqBody.Width,
 		)
 
+		// call the service to create the vehicle
 		err = h.sv.Create(vehicle)
 		if err != nil {
 			switch err {
@@ -129,11 +140,6 @@ func (h *VehicleDefault) Create() http.HandlerFunc {
 			"message": "Vehículo creado exitosamente.",
 		})
 	}
-}
-
-// VehicleBatchJSON is a struct that represents a list of vehicles in JSON format
-type VehicleBatchJSON struct {
-	Vehicles []VehicleJSON `json:"vehicles"`
 }
 
 // BatchCreate is a method that returns a handler for the route POST /vehicles/batch
@@ -206,7 +212,7 @@ func (h *VehicleDefault) GetByColorAndYear() http.HandlerFunc {
 		}
 
 		// process
-		// - get vehicles by color and year
+		// call the service to get the vehicles
 		v, err := h.sv.FindByColorAndYear(color, year)
 		if err != nil {
 			switch err {
@@ -259,7 +265,7 @@ func (h *VehicleDefault) Delete() http.HandlerFunc {
 		}
 
 		// process
-		// - delete vehicle by id
+		// - call the service to delete the vehicle by id
 		err = h.sv.Delete(id)
 		if err != nil {
 			switch err {
@@ -275,11 +281,6 @@ func (h *VehicleDefault) Delete() http.HandlerFunc {
 		// response
 		response.Text(w, http.StatusNoContent, "Vehículo eliminado exitosamente.")
 	}
-}
-
-// UpdateFuelTypeJSON is a struct that represents the request body for the route PUT /vehicles/{id}/fuel_type
-type UpdateFuelTypeJSON struct {
-	FuelType string `json:"fuel_type"`
 }
 
 // UpdateFuelType is a method that returns a handler for the route PUT /vehicles/{id}/fuel_type
@@ -303,7 +304,7 @@ func (h *VehicleDefault) UpdateFuelType() http.HandlerFunc {
 		}
 
 		// process
-		// - update fuel type by id
+		// - call the service to update the fuel type of the vehicle by id
 		err = h.sv.UpdateFuelType(id, reqBody.FuelType)
 		if err != nil {
 			switch err {
