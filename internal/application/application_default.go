@@ -78,6 +78,10 @@ func (a *ServerChi) Run() (err error) {
 		rt.Get("/color/{color}/year/{year}", hd.GetByColorAndYear())
 		// - DELETE /vehicles/{id}
 		rt.Delete("/{id}", hd.Delete())
+		// - PUT /vehicles/{id}/fuel-type
+		rt.Put("/{id}/fuel-type", hd.UpdateFuelType())
+		// - GET /weight?min={weight_min}&max={weight_max}
+		rt.Get("/weight", hd.GetByWeightRange())
 	})
 
 	// run server

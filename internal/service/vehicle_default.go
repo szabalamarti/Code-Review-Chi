@@ -62,3 +62,31 @@ func (s *VehicleDefault) Delete(id int) (err error) {
 	}
 	return
 }
+
+// UpdateFuelType is a method that updates the fuel type of a vehicle in the repository
+func (s *VehicleDefault) UpdateFuelType(id int, fuelType string) (err error) {
+	err = s.rp.UpdateFuelType(id, fuelType)
+	if err != nil {
+		switch err {
+		case internal.ErrVehicleNotFound:
+			return
+		default:
+			err = internal.ErrInternalServer
+		}
+	}
+	return
+}
+
+// FindByWeightRange is a method that returns a map of vehicles that match weight range
+func (s *VehicleDefault) FindByWeightRange(minWeight, maxWeight float64) (v map[int]internal.Vehicle, err error) {
+	v, err = s.rp.FindByWeightRange(minWeight, maxWeight)
+	if err != nil {
+		switch err {
+		case internal.ErrVehiclesNotFound:
+			return
+		default:
+			err = internal.ErrInternalServer
+		}
+	}
+	return
+}

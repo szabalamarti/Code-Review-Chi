@@ -6,10 +6,12 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+// VehicleDefaultMock is a struct that represents the default mock for vehicles service.
 type VehicleDefaultMock struct {
 	mock.Mock
 }
 
+// The following methods are the implementation of the VehicleDefault interface.
 func (m *VehicleDefaultMock) FindAll() (v map[int]internal.Vehicle, err error) {
 	args := m.Called()
 	return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
@@ -28,4 +30,14 @@ func (m *VehicleDefaultMock) FindByColorAndYear(color string, year int) (v map[i
 func (m *VehicleDefaultMock) Delete(id int) (err error) {
 	args := m.Called(id)
 	return args.Error(0)
+}
+
+func (m *VehicleDefaultMock) UpdateFuelType(id int, fuelType string) (err error) {
+	args := m.Called(id, fuelType)
+	return args.Error(0)
+}
+
+func (m *VehicleDefaultMock) FindByWeightRange(minWeight, maxWeight float64) (v map[int]internal.Vehicle, err error) {
+	args := m.Called(minWeight, maxWeight)
+	return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
 }

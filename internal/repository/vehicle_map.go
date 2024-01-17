@@ -71,3 +71,33 @@ func (r *VehicleMap) Delete(id int) (err error) {
 	delete(r.db, id)
 	return
 }
+
+// UpdateFuelType is a method that updates the fuel type of a vehicle in the repository
+func (r *VehicleMap) UpdateFuelType(id int, fuelType string) (err error) {
+	if _, ok := r.db[id]; !ok {
+		err = internal.ErrVehicleNotFound
+		return
+	}
+	vehicle := r.db[id]
+	vehicle.FuelType = fuelType
+	r.db[id] = vehicle
+	return
+}
+
+// FindByWeightRange is a method that returns a map of vehicles that match weight range
+func (r *VehicleMap) FindByWeightRange(minWeight, maxWeight float64) (v map[int]internal.Vehicle, err error) {
+	v = make(map[int]internal.Vehicle)
+
+	// Search in db
+	for key, value := range r.db {
+		if value.Weight >= minWeight && value.Weight <= maxWeight {
+			v[key] = value
+		}
+	}
+
+	if len(v) == 0 {
+		err = internal.ErrVehiclesNotFound
+	}
+
+	return
+}

@@ -215,3 +215,110 @@ func (h *VehicleDefault) Delete() http.HandlerFunc {
 		response.Text(w, http.StatusNoContent, "Vehículo eliminado exitosamente.")
 	}
 }
+
+// UpdateFuelTypeJSON is a struct that represents the request body for the route PUT /vehicles/{id}/fuel_type
+type UpdateFuelTypeJSON struct {
+	FuelType string `json:"fuel_type"`
+}
+
+// UpdateFuelType is a method that returns a handler for the route PUT /vehicles/{id}/fuel_type
+func (h *VehicleDefault) UpdateFuelType() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get id from URL using chi
+		idString := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idString)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Identificador mal formado.")
+			return
+		}
+
+		// - get fuel type from request body
+		var reqBody UpdateFuelTypeJSON
+		err = json.NewDecoder(r.Body).Decode(&reqBody)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Tipo de combustible mal formado o no admitido.")
+			return
+		}
+
+		// process
+		// - update fuel type by id
+		err = h.sv.UpdateFuelType(id, reqBody.FuelType)
+		if err != nil {
+			switch err {
+			case internal.ErrVehicleNotFound:
+				response.Error(w, http.StatusNotFound, "No se encontró el vehículo con ese identificador.")
+				return
+			default:
+				response.Error(w, http.StatusInternalServerError, "Algo ha salido mal.")
+				return
+			}
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "Tipo de combustible del vehículo actualizado exitosamente.",
+		})
+	}
+}
+
+// GetByWeightRange is a method that returns a handler for the route GET /vehicles/weight?min={weight_min}&max={weight_max}
+func (h *VehicleDefault) GetByWeightRange() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		// - get min and max from URL using chi
+		minString := r.URL.Query().Get("min")
+		maxString := r.URL.Query().Get("max")
+
+		// convert them to float64
+		min, err := strconv.ParseFloat(minString, 64)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Peso mínimo mal formado.")
+			return
+		}
+		max, err := strconv.ParseFloat(maxString, 64)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Peso máximo mal formado.")
+			return
+		}
+
+		// process
+		// - get vehicles by weight range
+		v, err := h.sv.FindByWeightRange(min, max)
+		if err != nil {
+			switch err {
+			case internal.ErrVehiclesNotFound:
+				response.Error(w, http.StatusNotFound, "No se encontraron vehículos con esos criterios.")
+				return
+			default:
+				response.Error(w, http.StatusInternalServerError, "Algo ha salido mal.")
+				return
+			}
+		}
+
+		// response
+		data := make(map[int]VehicleJSON)
+		for key, value := range v {
+			data[key] = VehicleJSON{
+				ID:              value.Id,
+				Brand:           value.Brand,
+				Model:           value.Model,
+				Registration:    value.Registration,
+				Color:           value.Color,
+				FabricationYear: value.FabricationYear,
+				Capacity:        value.Capacity,
+				MaxSpeed:        value.MaxSpeed,
+				FuelType:        value.FuelType,
+				Transmission:    value.Transmission,
+				Weight:          value.Weight,
+				Height:          value.Height,
+				Length:          value.Length,
+				Width:           value.Width,
+			}
+		}
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "Vehículos encontrados exitosamente.",
+			"data":    data,
+		})
+	}
+}
